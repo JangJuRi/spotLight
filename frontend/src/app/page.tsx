@@ -1,18 +1,38 @@
 "use client"
 
-import Map from "@/components/Map"
-import { useState } from "react"
+import Map from "@/components/main/Map"
+import React, { useState } from "react"
+import axiosInstance from "@/config/axiosInstance";
+import Loading from "@/components/common/Loading";
 
 export default function Home() {
-    const [query, setQuery] = useState("")
+    const [prompt, setPrompt] = useState("")
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const result = await axiosInstance.get('/api/main/gemini/generate', {
+            params: {
+                prompt: prompt
+            }
+        })
+
+        setLoading(false);
+
+        const { data, message, success } = result.data;
+        if (success) {
+            console.log(data)
+        } else {
+            alert(message);
+        }
     }
 
     return (
         <div className="home-container">
-            <h3 className="home-title">🍽️ 맛집 찾기</h3>
+            {loading && <Loading />}
+            <h3 className="home-title">🏢 장소 찾기</h3>
 
             <form className="search-form" onSubmit={handleSubmit}>
                 <div className="input-group input-group-lg">
@@ -20,8 +40,8 @@ export default function Home() {
                         type="text"
                         className="form-control search-input"
                         placeholder="예: 강남 초밥, 홍대 파스타..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
                     />
                     <button className="btn btn-search" type="submit">
                         검색

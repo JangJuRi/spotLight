@@ -8,12 +8,13 @@ import Loading from "@/components/common/Loading";
 export default function Home() {
     const [prompt, setPrompt] = useState("")
     const [loading, setLoading] = useState(false);
+    const [placeList, setPlaceList] = useState([]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        const result = await axiosInstance.get('/api/main/gemini/generate', {
+        const result = await axiosInstance.get('/api/main/place/load', {
             params: {
                 prompt: prompt
             }
@@ -24,6 +25,7 @@ export default function Home() {
         const { data, message, success } = result.data;
         if (success) {
             console.log(data)
+            setPlaceList(data);
         } else {
             alert(message);
         }
@@ -50,7 +52,7 @@ export default function Home() {
             </form>
 
             <div className="map-wrapper">
-                <Map />
+                <Map placeList={placeList}/>
             </div>
         </div>
     )

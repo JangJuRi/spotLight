@@ -1,6 +1,5 @@
 package com.jr.spotLight.api.main.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jr.spotLight.api.main.service.MainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
     private final MainService mainService;
 
-    @GetMapping("/api/main/gemini/generate")
-    public ResponseEntity<?> generateGemini(String prompt) throws JsonProcessingException {
-        return ResponseEntity.ok(mainService.generateGemini(prompt));
+    @GetMapping("/api/main/place/load")
+    public ResponseEntity<?> loadPlace(String prompt) throws Exception {
+        return ResponseEntity.ok(mainService.loadPlace(prompt));
     }
 }

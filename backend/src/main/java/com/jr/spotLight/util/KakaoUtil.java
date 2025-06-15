@@ -26,12 +26,17 @@ public class KakaoUtil {
         return !addressInfo.isEmpty() ? addressInfo.get(0) : null;
     }
 
-    public List<Map<String, String>> searchPlaceByKeyword(String keyword) throws Exception {
+    public List<Map<String, String>> searchPlaceByKeyword(String keyword, String courseId) throws Exception {
         String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
                 "?query=" + keyword;
 
         HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
         List<Map<String, String>> placeList = (List<Map<String, String>>) result.getData().get("documents");
+
+        // 각 Map에 keyword 키 추가
+        for (Map<String, String> place : placeList) {
+            place.put("courseId", courseId);
+        }
 
         return placeList;
     }

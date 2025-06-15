@@ -2,8 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
-export default function MapView() {
+interface MapViewProps {
+    mode: string;
+}
+
+export default function MapView({ mode } : MapViewProps) {
     const mapRef = useRef<HTMLDivElement>(null);
+    const height = mode === "place" ? "60vh" : "80vh";
 
     useEffect(() => {
         const initMap = () => {
@@ -31,5 +36,5 @@ export default function MapView() {
         }
     }, []);
 
-    return <div ref={mapRef} style={{ width: "100%", height: "60vh" }} />;
+    return <div ref={mapRef} style={{ width: "100%",  height: height }} />;
 }

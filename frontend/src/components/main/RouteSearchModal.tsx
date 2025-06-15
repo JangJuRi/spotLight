@@ -9,62 +9,16 @@ import {
 import {
     arrayMove,
     SortableContext,
-    useSortable,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import axiosInstance from "@/config/axiosInstance";
-import {placeProps, RouteListInfoProps} from "@/types/types";
+import {RouteListInfoProps} from "@/types/types";
 import Loading from "@/components/common/Loading";
+import DraggableItem from "@/components/common/DraggableItem";
 
 interface Item {
     id: string;
     content: string;
-}
-
-function DraggableItem({ id, content, onDelete }: { id: string; content: string; onDelete: () => void }) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-
-    const style: React.CSSProperties = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        cursor: 'grab',
-        userSelect: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '8px 12px',
-        border: '1px solid #ccc',
-        borderRadius: '6px',
-        marginBottom: '6px',
-        backgroundColor: 'white',
-    };
-
-    const className = `draggable-item${isDragging ? ' dragging' : ''}`;
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
-            className={className}
-        >
-            <span>{content}</span>
-            <button
-                type="button"
-                className="btn-close"
-                aria-label="삭제"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                }}
-                onPointerDown={(e) => {
-                    e.stopPropagation();
-                }}
-            />
-        </div>
-    );
 }
 
 export default function RouteSearchModal({ onClose , routeListInfoSetting}: { onClose: () => void, routeListInfoSetting: (routeListInfo: RouteListInfoProps) => void }) {
@@ -78,7 +32,7 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
         { id: 'brunch', content: '브런치' },
         { id: 'restaurant', content: '맛집' },
         { id: 'bar', content: '술집' },
-        { id: 'walk', content: '산책' },
+        { id: 'walk', content: '공원' },
         { id: 'exhibition', content: '전시회' },
         { id: 'cafe', content: '카페' },
     ];
@@ -93,9 +47,9 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
 
     const categoryCombinations: Item[] = [
         { id: 'all', content: '전체' },
-        { id: 'shortest', content: '최단거리' },
-        { id: 'cheapest', content: '낮은가격' },
-        { id: 'popular', content: '인기순' },
+        { id: 'shortest', content: '기준 장소 주변' },
+        { id: 'cheapest', content: '낮은 가격' },
+        { id: 'popular', content: '인기 많은 곳' },
     ];
 
     const handleSearch = async () => {
@@ -149,13 +103,13 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
 
                 <div className="section">
                     <label className="section-title" htmlFor="location-input">
-                        지역 검색
+                        기준 장소
                     </label>
                     <input
                         id="location-input"
                         className="input-search"
                         type="text"
-                        placeholder="지역을 입력하세요"
+                        placeholder="예: 강남역, 코엑스, 여의도 더현대..."
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
                     />
@@ -216,8 +170,6 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
                 </div>
 
                 <div className="section">
-                    <div className="section-title">카테고리 조합</div>
-
                     <div style={{ marginBottom: '12px' }}>
                         <div className="list-title">대상</div>
                         <div style={{ display: 'flex', gap: '8px' }}>

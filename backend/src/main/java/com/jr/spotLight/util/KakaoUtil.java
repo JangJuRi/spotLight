@@ -5,8 +5,14 @@ import okhttp3.Headers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Component
 public class KakaoUtil {
@@ -27,18 +33,51 @@ public class KakaoUtil {
     }
 
     public List<Map<String, String>> searchPlaceByKeyword(String keyword, String courseId) throws Exception {
-        String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
-                "?query=" + keyword;
+        ExecutorService executor = Executors.newFixedThreadPool(3); // 병렬 요청을 위한 스레드 풀
 
-        HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
-        List<Map<String, String>> placeList = (List<Map<String, String>>) result.getData().get("documents");
+        List<CompletableFuture<List<Map<String, String>>>> futures = new ArrayList<>();
 
-        // 각 Map에 keyword 키 추가
-        for (Map<String, String> place : placeList) {
-            place.put("courseId", courseId);
+        // 카카오 API는 요청 한번 당 최대 데이터 15개여서 3번 반복
+        for (int page = 1; page <= 3; page++) {
+            final int currentPage = page;
+
+            CompletableFuture<List<Map<String, String>>> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
+                            "?query=" + keyword +
+                            "&page=" + currentPage +
+                            "&size=15";
+
+                    HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
+                    Map<String, Object> data = result.getData();
+
+                    List<Map<String, String>> placeList = (List<Map<String, String>>) data.get("documents");
+
+                    // courseId 추가
+                    for (Map<String, String> place : placeList) {
+                        place.put("courseId", courseId);
+                    }
+
+                    return placeList;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return Collections.emptyList(); // 예외 발생 시 빈 리스트 반환
+                }
+            }, executor);
+
+            futures.add(future);
         }
 
-        return placeList;
+        // 모든 작업이 끝날 때까지 기다리고 결과 합치기
+        List<Map<String, String>> allResults = futures.stream()
+                .map(CompletableFuture::join)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        executor.shutdown(); // 스레드풀 종료
+
+        return allResults;
     }
 
     public Headers getHeaders() {

@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum CourseOption {
-    BRUNCH("brunch", "브런치"),
+    BRUNCH("brunch", "브런치카페"),
     LUNCH("restaurant", "맛집"),
     DINNER("bar", "술집"),
-    WALK("walk", "산책"),
+    WALK("walk", "공원"),
     EXHIBITION("exhibition", "전시회"),
     CAFE("cafe", "카페");
 

@@ -25,8 +25,6 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
     const [loading, setLoading] = useState(false);
     const [location, setLocation] = useState('');
     const [courseList, setCourseList] = useState<Item[]>([]);
-    const [selectedTarget, setSelectedTarget] = useState<Item | null>(null);
-    const [selectedCombination, setSelectedCombination] = useState<Item | null>(null);
 
     const courseOptions: Item[] = [
         { id: 'brunch', content: '브런치' },
@@ -37,29 +35,12 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
         { id: 'cafe', content: '카페' },
     ];
 
-    const categoryTargets: Item[] = [
-        { id: 'all', content: '전체' },
-        { id: 'couple', content: '연인' },
-        { id: 'friends', content: '친구' },
-        { id: 'family', content: '가족' },
-        { id: 'office', content: '동료' },
-    ];
-
-    const categoryCombinations: Item[] = [
-        { id: 'all', content: '전체' },
-        { id: 'shortest', content: '기준 장소 주변' },
-        { id: 'cheapest', content: '낮은 가격' },
-        { id: 'popular', content: '인기 많은 곳' },
-    ];
-
     const handleSearch = async () => {
         setLoading(true);
 
         const result = await axiosInstance.post('/api/main/recommend-route/load', {
             location: location,
             courseIdList: courseList.map(item => item.id),
-            selectedTargetId: selectedTarget?.id === 'all' ? '' : selectedTarget?.id,
-            selectedCombinationId: selectedCombination?.id === 'all' ? '' : selectedCombination?.id,
         });
 
         setLoading(false);
@@ -81,30 +62,19 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
         setCourseList(courseList.filter((item) => item.id !== id));
     };
 
-    const toggleTarget = (item: Item) => {
-        setSelectedTarget((prev) => (prev?.id === item.id ? null : item));
-    };
-
-    const toggleCombination = (item: Item) => {
-        setSelectedCombination((prev) => (prev?.id === item.id ? null : item));
-    };
-
     return (
         <div className="modal-background">
             {loading && <Loading />}
 
-            <div className="modal-container" style={{ width: '60vw' }}>
+            <div className="modal-container"
+                 style={{ width: '60vw'}}
+            >
                 <div className="modal-header">
                     <h3 className="modal-title">추천 루트 검색</h3>
-                    <button className="close-button" onClick={onClose}>
-                        &times;
-                    </button>
+                    <button className="close-button" onClick={onClose}>&times;</button>
                 </div>
 
                 <div className="section">
-                    <label className="section-title" htmlFor="location-input">
-                        기준 장소
-                    </label>
                     <input
                         id="location-input"
                         className="input-search"
@@ -115,9 +85,8 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
                     />
                 </div>
 
-                <div className="section">
-                    <div className="section-title">코스 조합</div>
-                    <div className="drag-list-container" style={{ display: 'flex', gap: '16px' }}>
+                <div className="section" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}> {/* 높이 확장 */}
+                    <div className="drag-list-container">
                         <div className="list-box" style={{ flex: 1 }}>
                             <div className="list-title">선택 가능한 코스</div>
                             {courseOptions.map((item) => (
@@ -169,46 +138,14 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
                     </div>
                 </div>
 
-                <div className="section">
-                    <div style={{ marginBottom: '12px' }}>
-                        <div className="list-title">대상</div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            {categoryTargets.map((item) => (
-                                <button
-                                    key={item.id}
-                                    className={`circle-button${selectedTarget?.id === item.id ? ' selected' : ''}`}
-                                    onClick={() => toggleTarget(item)}
-                                    type="button"
-                                >
-                                    {item.content}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className="list-title">조합</div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            {categoryCombinations.map((item) => (
-                                <button
-                                    key={item.id}
-                                    className={`circle-button${selectedCombination?.id === item.id ? ' selected' : ''}`}
-                                    onClick={() => toggleCombination(item)}
-                                    type="button"
-                                >
-                                    {item.content}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="search-button-container" style={{ marginTop: '20px', textAlign: 'center' }}>
+                {/* 아래 고정 버튼 */}
+                <div className="search-button-container">
                     <button className="search-button" onClick={handleSearch}>
                         루트 검색
                     </button>
                 </div>
             </div>
+
         </div>
     );
 }

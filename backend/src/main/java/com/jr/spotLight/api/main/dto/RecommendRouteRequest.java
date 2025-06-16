@@ -10,6 +10,4 @@ import java.util.List;
 public class RecommendRouteRequest {
     private String location;
     private List<String> courseIdList;
-    private String selectedTargetId;
-    private String selectedCombinationId;
 }

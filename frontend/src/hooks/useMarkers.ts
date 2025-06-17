@@ -8,6 +8,7 @@ export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = f
 
         const markers: any[] = [];
         const overlays: any[] = [];
+        window.overlayMap = {};
 
         placeList.forEach((place, index) => {
             const markerImage = new window.kakao.maps.MarkerImage(
@@ -24,7 +25,7 @@ export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = f
             markers.push(marker);
 
             const iwContent = `
-            <div id="overlay-${index}" class="card shadow-sm border-primary rounded-3 border" 
+            <div id="overlay-${place.id}" class="card shadow-sm border-primary rounded-3 border" 
                  style="width: 18rem; font-size: 0.9rem; white-space: normal;">
                  <button class="btn-close position-absolute top-0 end-0 m-2 close-overlay" 
                          aria-label="Close" style="z-index: 10;"></button>
@@ -54,13 +55,15 @@ export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = f
             });
             overlays.push(overlay);
 
+            window.overlayMap[place.id] = overlay;
+
             window.kakao.maps.event.addListener(marker, "click", () => {
                 if (window.currentOverlay) window.currentOverlay.setMap(null);
                 overlay.setMap(map);
                 window.currentOverlay = overlay;
 
                 setTimeout(() => {
-                    const container = document.querySelector(`#overlay-${index}`);
+                    const container = document.querySelector(`#overlay-${place.id}`);
                     if (!container) return;
 
                     const closeBtn = container.querySelector(".close-overlay");

@@ -1,4 +1,5 @@
 export interface PlaceProps {
+    id: string;
     name: string;
     address: string;
     url: string;

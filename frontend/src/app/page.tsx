@@ -6,17 +6,28 @@ import Loading from "@/components/common/Loading";
 import MapContainer from "@/components/main/MapContainer";
 import RouteSearchModal from "@/components/main/RouteSearchModal";
 import {PlaceListInfoProps, PlaceProps, RouteListInfoProps} from "@/types/types";
+import SlidePanel from "@/components/common/SlidePanel";
 
 export default function Home() {
+    const [loading, setLoading] = useState(false);
     const [mode, setMode] = useState<'place' | 'route'>('place');
     const [prompt, setPrompt] = useState("")
-    const [loading, setLoading] = useState(false);
     const [placeList, setPlaceList] = useState<PlaceProps[]>([]);
+    const [placeListInfo, setPlaceListInfo] = useState<PlaceListInfoProps[]>([{
+        placeList: [],          // 빈 배열로 초기화
+        keyword: ""         // 빈 문자열로 초기화
+    }]);
     const [routeListInfo, setRouteListInfo] = useState<RouteListInfoProps>({
         routeList: [],          // 빈 배열로 초기화
         description: ""         // 빈 문자열로 초기화
     });
+    const [selectedPlace, setSelectedPlace] = useState<PlaceProps | null>(null);
+
     const [modalOpen, setModalOpen] = useState(false);
+    const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+    const [expandedIndexes, setExpandedIndexes] = React.useState(() =>
+        placeListInfo.map(() => true) // 초기값: 모두 펼침 상태(true)
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,9 +42,13 @@ export default function Home() {
         setLoading(false);
 
         const { data, message, success } = result.data;
-        console.log(data)
         if (success) {
+            setPlaceListInfo(data);
+            console.log(data)
+            console.log(placeListInfo)
+            console.log(placeListInfo)
             setPlaceList(data.flatMap((item: PlaceListInfoProps) => item.placeList));
+            setSearchPanelOpen(true);
         } else {
             alert(message);
         }
@@ -43,6 +58,14 @@ export default function Home() {
         console.log(routeListInfo)
         setRouteListInfo(routeListInfo);
     }
+
+    const toggleExpand = (index: number) => {
+        setExpandedIndexes(prev => {
+            const newExpanded = [...prev];
+            newExpanded[index] = !newExpanded[index];
+            return newExpanded;
+        });
+    };
 
     return (
         <div className="home-container">
@@ -77,6 +100,7 @@ export default function Home() {
                                 placeholder="예: 강남 초밥, 홍대 파스타..."
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
+                                required={true}
                                 style={{ maxWidth: '500px' }}
                             />
                             <button className="btn btn-search" type="submit">
@@ -137,13 +161,82 @@ export default function Home() {
                         transition: 'width 0.4s ease',
                     }}
                 >
-                    <MapContainer placeList={placeList} routeList={routeListInfo.routeList} mode={mode}/>
+                    <MapContainer placeList={placeList}
+                                  routeList={routeListInfo.routeList}
+                                  mode={mode}
+                                  selectedPlace={selectedPlace}/>
                 </div>
             )}
 
             {modalOpen && <RouteSearchModal
                 onClose={() => setModalOpen(false)}
                 routeListInfoSetting={routeListInfoSetting}/>}
+
+            {mode === 'place' &&
+                <SlidePanel
+                    isOpen={searchPanelOpen}
+                    onClose={() => setSearchPanelOpen(false)}
+                    onOpen={() => setSearchPanelOpen(true)}
+                >
+                    {placeListInfo[0].keyword ? (
+                        <div className="d-flex flex-column gap-3">
+                            {placeListInfo.map((placeInfo, placeInfoIndex) => (
+                                <div key={placeInfoIndex} className="card">
+                                    <div
+                                        className="d-flex justify-content-between align-items-center p-3"
+                                        style={{cursor: 'pointer'}}
+                                        onClick={() => toggleExpand(placeInfoIndex)}
+                                    >
+                                        <span className="fw-bold fs-5 text-primary">{placeInfo.keyword}</span>
+                                        <button
+                                            className="btn btn-sm btn-outline-primary"
+                                            onClick={e => {
+                                                e.stopPropagation(); // 부모 onClick과 겹치지 않게
+                                                toggleExpand(placeInfoIndex);
+                                            }}
+                                            aria-label={expandedIndexes[placeInfoIndex] ? '접기' : '펼치기'}
+                                        >
+                                            {expandedIndexes[placeInfoIndex] ? '▼' : '▶'}
+                                        </button>
+                                    </div>
+
+                                    {expandedIndexes[placeInfoIndex] && placeInfo.placeList.map((place, placeIndex) => (
+                                        <div className="card-body" key={placeIndex}>
+                                            <h6 className="card-title fw-bold text-primary">
+                                                {place.place_name}
+                                            </h6>
+
+                                            <p className="card-text mb-1">
+                                                <strong>주소:</strong>{' '}
+                                                {place.road_address_name || place.address_name}
+                                            </p>
+
+                                            {place.phone && (
+                                                <p className="card-text mb-1">
+                                                    <strong>전화:</strong> {place.phone}
+                                                </p>
+                                            )}
+
+                                            <a
+                                                href="#"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setSelectedPlace(place);
+                                                }}
+                                                className="btn btn-sm btn-outline-primary mt-2"
+                                            >
+                                                지도에서 보기
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-muted">검색 결과가 없습니다.</p>
+                    )}
+                </SlidePanel>
+            }
         </div>
     );
 }

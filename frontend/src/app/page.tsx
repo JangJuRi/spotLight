@@ -5,13 +5,13 @@ import axiosInstance from "@/config/axiosInstance";
 import Loading from "@/components/common/Loading";
 import MapContainer from "@/components/main/MapContainer";
 import RouteSearchModal from "@/components/main/RouteSearchModal";
-import {placeProps, RouteListInfoProps} from "@/types/types";
+import {PlaceListInfoProps, PlaceProps, RouteListInfoProps} from "@/types/types";
 
 export default function Home() {
     const [mode, setMode] = useState<'place' | 'route'>('place');
     const [prompt, setPrompt] = useState("")
     const [loading, setLoading] = useState(false);
-    const [placeList, setPlaceList] = useState<placeProps[]>([]);
+    const [placeList, setPlaceList] = useState<PlaceProps[]>([]);
     const [routeListInfo, setRouteListInfo] = useState<RouteListInfoProps>({
         routeList: [],          // 빈 배열로 초기화
         description: ""         // 빈 문자열로 초기화
@@ -31,8 +31,9 @@ export default function Home() {
         setLoading(false);
 
         const { data, message, success } = result.data;
+        console.log(data)
         if (success) {
-            setPlaceList(data);
+            setPlaceList(data.flatMap((item: PlaceListInfoProps) => item.placeList));
         } else {
             alert(message);
         }

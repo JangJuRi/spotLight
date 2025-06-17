@@ -1,11 +1,11 @@
 "use client";
 
-import {placeProps} from "@/types/types";
+import {PlaceProps} from "@/types/types";
 import {useEffect} from "react";
 import {useMarkers} from "@/hooks/useMarkers";
 
 interface RouteLineManagerProps {
-    routeList: placeProps[];
+    routeList: PlaceProps[];
 }
 
 export default function RouteLineManager({ routeList }: RouteLineManagerProps) {

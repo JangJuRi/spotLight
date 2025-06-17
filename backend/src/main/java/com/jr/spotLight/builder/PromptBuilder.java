@@ -13,10 +13,18 @@ public class PromptBuilder {
 
     private final PromptUtil promptUtil;
 
-    public String routeSelectFilterPrompt(String location) {
+    public String recommendPlaceFilterPrompt() {
         StringBuilder prompt = new StringBuilder();
 
-        prompt.append(promptUtil.load("route/select_prompt.txt")).append("\n");
+        prompt.append(promptUtil.load("place/recommend_prompt.txt")).append("\n");
+
+        return prompt.toString();
+    }
+
+    public String recommendRouteFilterPrompt(String location) {
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append(promptUtil.load("route/recommend_prompt.txt")).append("\n");
 
         Map<String, String> values = Map.of(
                 "location", location
@@ -25,7 +33,7 @@ public class PromptBuilder {
         return new StringSubstitutor(values).replace(prompt.toString());
     }
 
-    public String buildDescriptionPrompt() {
+    public String recommendRouteDescriptionPrompt() {
         return promptUtil.load("route/description_prompt.txt");
     }
 }

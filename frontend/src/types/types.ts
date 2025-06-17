@@ -1,4 +1,4 @@
-export interface placeProps {
+export interface PlaceProps {
     name: string;
     address: string;
     url: string;
@@ -13,6 +13,11 @@ export interface placeProps {
 }
 
 export interface RouteListInfoProps {
-    routeList: placeProps[],
+    routeList: PlaceProps[],
     description: string
+}
+
+export interface PlaceListInfoProps {
+    placeList: PlaceProps[],
+    keyword: string
 }

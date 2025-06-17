@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { placeProps } from "@/types/types";
+import { PlaceProps } from "@/types/types";
 
-export function useMarkers(placeList: placeProps[], showMarkerImage: boolean = false) {
+export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = false) {
     useEffect(() => {
         const map = window.mapInstance;
         if (!map || !window.kakao?.maps) return;

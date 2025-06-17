@@ -2,13 +2,13 @@
 
 import MapView from "./MapView";
 import MarkerOverlayManager from "./MarkerOverlayManager";
-import {placeProps, RouteListInfoProps} from "@/types/types";
+import {PlaceProps, RouteListInfoProps} from "@/types/types";
 import RouteLineManager from "@/components/main/RouteLineManager";
 
 interface MapContainerProps {
     mode: string,
-    placeList: placeProps[],
-    routeList: placeProps[]
+    placeList: PlaceProps[],
+    routeList: PlaceProps[]
 }
 
 export default function MapContainer({ placeList, routeList, mode }: MapContainerProps) {

@@ -1,8 +1,8 @@
 import { useMarkers } from "@/hooks/useMarkers";
-import { placeProps } from "@/types/types";
+import { PlaceProps } from "@/types/types";
 
 interface MarkerOverlayManagerProps {
-    placeList: placeProps[];
+    placeList: PlaceProps[];
 }
 
 export default function MarkerOverlayManager({ placeList }: MarkerOverlayManagerProps) {

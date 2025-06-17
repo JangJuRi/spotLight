@@ -32,7 +32,19 @@ public class KakaoUtil {
         return !addressInfo.isEmpty() ? addressInfo.get(0) : null;
     }
 
-    public List<Map<String, String>> searchPlaceByKeyword(String keyword, String courseId) throws Exception {
+    public List<Map<String, String>> searchPlaceByKeyword(String keyword, int currentPage, int size) throws Exception {
+        String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
+                "?query=" + keyword +
+                "&page=" + currentPage +
+                "&size=15";
+
+        HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
+        Map<String, Object> data = result.getData();
+
+        return (List<Map<String, String>>) data.get("documents");
+    }
+
+    public List<Map<String, String>> searchCoursePlace(String keyword, String courseId) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(3); // 병렬 요청을 위한 스레드 풀
 
         List<CompletableFuture<List<Map<String, String>>>> futures = new ArrayList<>();
@@ -43,15 +55,7 @@ public class KakaoUtil {
 
             CompletableFuture<List<Map<String, String>>> future = CompletableFuture.supplyAsync(() -> {
                 try {
-                    String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
-                            "?query=" + keyword +
-                            "&page=" + currentPage +
-                            "&size=15";
-
-                    HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
-                    Map<String, Object> data = result.getData();
-
-                    List<Map<String, String>> placeList = (List<Map<String, String>>) data.get("documents");
+                    List<Map<String, String>> placeList = searchPlaceByKeyword(keyword, currentPage, 15);
 
                     // courseId 추가
                     for (Map<String, String> place : placeList) {

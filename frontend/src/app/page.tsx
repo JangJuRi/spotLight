@@ -13,14 +13,19 @@ export default function Home() {
     const [mode, setMode] = useState<'place' | 'route'>('place');
     const [prompt, setPrompt] = useState("")
     const [placeList, setPlaceList] = useState<PlaceProps[]>([]);
-    const [placeListInfo, setPlaceListInfo] = useState<PlaceListInfoProps[]>([{
-        placeList: [],          // 빈 배열로 초기화
-        keyword: ""         // 빈 문자열로 초기화
-    }]);
-    const [routeListInfo, setRouteListInfo] = useState<RouteListInfoProps>({
-        routeList: [],          // 빈 배열로 초기화
-        description: ""         // 빈 문자열로 초기화
-    });
+
+    const initialPlaceListInfo: PlaceListInfoProps[] = [{
+        placeList: [],
+        keyword: ""
+    }];
+
+    const initialRouteListInfo: RouteListInfoProps = {
+        routeList: [],
+        description: ""
+    };
+
+    const [placeListInfo, setPlaceListInfo] = useState<PlaceListInfoProps[]>(initialPlaceListInfo);
+    const [routeListInfo, setRouteListInfo] = useState<RouteListInfoProps>(initialRouteListInfo);
     const [selectedPlace, setSelectedPlace] = useState<PlaceProps | null>(null);
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -72,19 +77,26 @@ export default function Home() {
             {loading && <Loading />}
 
             {/* 버튼 영역 */}
-            <div className="text-center mb-3">
-                <div className="btn-group mt-2" role="group">
+            <div className="text-center mb-4">
+                <div className="btn-group custom-toggle-group" role="group">
                     <button
-                        className={`btn ${mode === 'place' ? 'btn-primary' : 'btn-outline-primary'}`}
-                        onClick={() => setMode('place')}
+                        className={`custom-toggle-btn ${mode === 'place' ? 'active' : ''}`}
+                        onClick={() => {
+                            setMode('place');
+                            setRouteListInfo(initialRouteListInfo);
+
+                        }}
                     >
                         장소 찾기
                     </button>
                     <button
-                        className={`btn ${mode === 'route' ? 'btn-primary' : 'btn-outline-primary'}`}
-                        onClick={() => setMode('route')}
+                        className={`custom-toggle-btn ${mode === 'route' ? 'active' : ''}`}
+                        onClick={() => {
+                            setMode('route');
+                            setPlaceListInfo(initialPlaceListInfo);
+                        }}
                     >
-                        루트 찾기
+                        루트 추천
                     </button>
                 </div>
             </div>
@@ -143,7 +155,7 @@ export default function Home() {
                                 style={{ borderRadius: 6 }}
                                 onClick={() => setModalOpen(true)}
                             >
-                                추천 루트 검색
+                                루트 추천받기
                             </button>
                         </div>
 
@@ -222,6 +234,7 @@ export default function Home() {
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     setSelectedPlace(place);
+                                                    setSearchPanelOpen(false);
                                                 }}
                                                 className="btn btn-sm btn-outline-primary mt-2"
                                             >

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { PlaceProps } from "@/types/types";
 
-export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = false) {
+export const useMarkers = (placeList: PlaceProps[], showMarkerImage: boolean = false) => {
     useEffect(() => {
         const map = window.mapInstance;
         if (!map || !window.kakao?.maps) return;
@@ -84,9 +84,14 @@ export function useMarkers(placeList: PlaceProps[], showMarkerImage: boolean = f
 
         // 클린업: 컴포넌트 언마운트 시 마커와 오버레이 제거
         return () => {
-            markers.forEach(marker => marker.setMap(null));
-            overlays.forEach(overlay => overlay.setMap(null));
-            window.currentOverlay = null;
+            clearKakaoMarkersAndOverlays(markers, overlays);
         };
     }, [placeList]);
+}
+
+const clearKakaoMarkersAndOverlays = (markers: any[], overlays: any[]) => {
+    markers.forEach(marker => marker.setMap(null));
+    overlays.forEach(overlay => overlay.setMap(null));
+    if (window.currentOverlay) window.currentOverlay.setMap(null);
+    window.currentOverlay = null;
 }

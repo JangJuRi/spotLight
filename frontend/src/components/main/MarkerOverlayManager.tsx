@@ -15,9 +15,10 @@ export default function MarkerOverlayManager({ placeList, selectedPlace }: Marke
         const map = window.mapInstance;
         if (!map || !window.kakao?.maps) return;
 
+        if (window.currentOverlay) window.currentOverlay.setMap(null);
+
         // 선택한 장소의 마커로 이동
         if (selectedPlace) {
-            if (window.currentOverlay) window.currentOverlay.setMap(null);
             const latLng = new window.kakao.maps.LatLng(selectedPlace.y, selectedPlace.x);
             map.panTo(latLng);
 

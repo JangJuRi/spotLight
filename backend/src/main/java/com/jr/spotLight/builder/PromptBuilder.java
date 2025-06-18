@@ -21,13 +21,13 @@ public class PromptBuilder {
         return prompt.toString();
     }
 
-    public String recommendRouteFilterPrompt(String location) {
+    public String recommendRouteFilterPrompt(String placeNameList) {
         StringBuilder prompt = new StringBuilder();
 
         prompt.append(promptUtil.load("route/recommend_prompt.txt")).append("\n");
 
         Map<String, String> values = Map.of(
-                "location", location
+                "placeNameList", placeNameList
         );
 
         return new StringSubstitutor(values).replace(prompt.toString());

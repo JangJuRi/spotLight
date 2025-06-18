@@ -74,7 +74,7 @@ public class MainService {
 
         // 1차 프롬프트: 필터링
         String filterPrompt = promptBuilder.recommendRouteFilterPrompt(
-                recommendRouteRequest.getLocation()
+                recommendRouteRequest.getPlaceNameList().isEmpty() ? "" : CommonUtil.ObjectToJson(recommendRouteRequest.getPlaceNameList())
         );
 
         GenerateContentResponse response = geminiUtil.generateResponse(CommonUtil.ObjectToJson(wrapList) + filterPrompt);

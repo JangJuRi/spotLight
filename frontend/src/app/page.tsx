@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState } from "react"
+import React, {useRef, useState} from "react"
 import axiosInstance from "@/config/axiosInstance";
 import Loading from "@/components/common/Loading";
 import MapContainer from "@/components/main/MapContainer";
 import RouteSearchModal from "@/components/main/RouteSearchModal";
 import {PlaceListInfoProps, PlaceProps, RouteListInfoProps} from "@/types/types";
 import SlidePanel from "@/components/common/SlidePanel";
+import {useRecommendRoute} from "@/hooks/useRecommendRoute";
 
 export default function Home() {
     const [loading, setLoading] = useState(false);
@@ -34,6 +35,9 @@ export default function Home() {
         placeListInfo.map(() => true) // 초기값: 모두 펼침 상태(true)
     );
 
+    const [searchLocation, setSearchLocation] = useState('');
+    const [searchCourseIdList, setSearchCourseIdList] = useState<string[]>([]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -60,7 +64,6 @@ export default function Home() {
     }
 
     const routeListInfoSetting = (routeListInfo: RouteListInfoProps) => {
-        console.log(routeListInfo)
         setRouteListInfo(routeListInfo);
     }
 
@@ -71,6 +74,16 @@ export default function Home() {
             return newExpanded;
         });
     };
+
+    const reloadRecommend = async () => {
+        setLoading(true);
+
+        const placeNameList: string[] = routeListInfo.routeList.map(route => route.place_name);
+        const result = await useRecommendRoute(searchLocation, searchCourseIdList, placeNameList);
+        routeListInfoSetting(result);
+
+        setLoading(false);
+    }
 
     return (
         <div className="home-container">
@@ -157,6 +170,13 @@ export default function Home() {
                             >
                                 루트 추천받기
                             </button>
+                            <button
+                                className="btn btn-outline-primary fw-bold ms-2"
+                                style={{borderRadius: 6}}
+                                onClick={() => reloadRecommend()}
+                            >
+                                <i className="bi bi-arrow-clockwise"></i>
+                            </button>
                         </div>
 
                         <h5>📍 경로 설명</h5>
@@ -181,7 +201,11 @@ export default function Home() {
             )}
 
             {modalOpen && <RouteSearchModal
-                onClose={() => setModalOpen(false)}
+                onClose={(location:string, courseIdList: string[]) => {
+                    setModalOpen(false);
+                    setSearchLocation(location);
+                    setSearchCourseIdList(courseIdList);
+                }}
                 routeListInfoSetting={routeListInfoSetting}/>}
 
             {mode === 'place' &&

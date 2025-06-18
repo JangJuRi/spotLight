@@ -11,17 +11,17 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import axiosInstance from "@/config/axiosInstance";
 import {RouteListInfoProps} from "@/types/types";
 import Loading from "@/components/common/Loading";
 import DraggableItem from "@/components/common/DraggableItem";
+import {useRecommendRoute} from "@/hooks/useRecommendRoute";
 
 interface Item {
     id: string;
     content: string;
 }
 
-export default function RouteSearchModal({ onClose , routeListInfoSetting}: { onClose: () => void, routeListInfoSetting: (routeListInfo: RouteListInfoProps) => void }) {
+export default function RouteSearchModal({ onClose , routeListInfoSetting}: { onClose: (location: string, courseIdList: string[]) => void, routeListInfoSetting: (routeListInfo: RouteListInfoProps) => void }) {
     const [loading, setLoading] = useState(false);
     const [location, setLocation] = useState('');
     const [courseList, setCourseList] = useState<Item[]>([]);
@@ -38,19 +38,13 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
     const handleSearch = async () => {
         setLoading(true);
 
-        const result = await axiosInstance.post('/api/main/recommend-route/load', {
-            location: location,
-            courseIdList: courseList.map(item => item.id),
-        });
+        const result = await useRecommendRoute(location, courseList.map(item => item.id));
 
         setLoading(false);
 
-        const { data, message, success } = result.data;
-
-        routeListInfoSetting(data);
-        onClose();
+        routeListInfoSetting(result);
+        onClose(location, courseList.map(item => item.id));
     };
-
 
     const addCourseItem = (item: Item) => {
         if (!courseList.find((i) => i.id === item.id)) {
@@ -71,7 +65,9 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
             >
                 <div className="modal-header">
                     <h3 className="modal-title">추천 루트 검색</h3>
-                    <button className="close-button" onClick={onClose}>&times;</button>
+                    <button className="close-button" onClick={() => {
+                        onClose(location, courseList.map(item => item.id));
+                    }}>&times;</button>
                 </div>
 
                 <div className="section">
@@ -140,7 +136,7 @@ export default function RouteSearchModal({ onClose , routeListInfoSetting}: { on
 
                 {/* 아래 고정 버튼 */}
                 <div className="search-button-container">
-                    <button className="search-button" onClick={handleSearch}>
+                    <button className="search-button" onClick={() => handleSearch()}>
                         루트 검색
                     </button>
                 </div>

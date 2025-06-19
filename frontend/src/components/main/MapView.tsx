@@ -6,51 +6,29 @@ interface MapViewProps {
     mode: string;
 }
 
-export default function MapView({ mode }: MapViewProps) {
+export default function MapView({ mode } : MapViewProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const height = mode === "place" ? "60vh" : "80vh";
 
     useEffect(() => {
-        const initMap = (lat: number, lng: number) => {
+        const initMap = () => {
             if (!mapRef.current || !window.kakao?.maps) return;
 
             const map = new window.kakao.maps.Map(mapRef.current, {
-                center: new window.kakao.maps.LatLng(lat, lng),
+                center: new window.kakao.maps.LatLng(37.5665, 126.978),
                 level: 3,
             });
 
             window.mapInstance = map;
         };
 
-        const loadMapWithCurrentLocation = () => {
-            if (!navigator.geolocation) {
-                alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
-                // 기본 위치(서울 시청)로 fallback
-                initMap(37.5665, 126.978);
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    initMap(lat, lng);
-                },
-                (err) => {
-                    alert("위치 정보를 가져오지 못했습니다: " + err.message);
-                    // 기본 위치로 fallback
-                    initMap(37.5665, 126.978);
-                }
-            );
-        };
-
         if (window.kakao?.maps) {
-            window.kakao.maps.load(loadMapWithCurrentLocation);
+            window.kakao.maps.load(initMap);
         } else {
             const interval = setInterval(() => {
                 if (window.kakao?.maps) {
                     clearInterval(interval);
-                    window.kakao.maps.load(loadMapWithCurrentLocation);
+                    window.kakao.maps.load(initMap);
                 }
             }, 200);
 
@@ -72,9 +50,6 @@ export default function MapView({ mode }: MapViewProps) {
 
                 // 지도 중심 이동
                 window.mapInstance.setCenter(loc);
-
-                // 마커도 찍고 싶으면 아래 주석 해제
-                // new window.kakao.maps.Marker({ map: window.mapInstance, position: loc });
             },
             (err) => {
                 alert("위치 정보를 가져오지 못했습니다: " + err.message);

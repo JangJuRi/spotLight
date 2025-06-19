@@ -36,7 +36,7 @@ public class KakaoUtil {
         String endPoint = "https://dapi.kakao.com/v2/local/search/keyword.json" +
                 "?query=" + keyword +
                 "&page=" + currentPage +
-                "&size=15";
+                "&size=" + size;
 
         HttpResponseDto result = httpUtil.get(endPoint, getHeaders());
         Map<String, Object> data = result.getData();
@@ -60,6 +60,8 @@ public class KakaoUtil {
                     // courseId 추가
                     for (Map<String, String> place : placeList) {
                         place.put("courseId", courseId);
+
+
                     }
 
                     return placeList;

@@ -1,6 +1,7 @@
 package com.jr.spotLight.util;
 
 import com.jr.spotLight.util.dto.HttpResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class KakaoUtil {
     @Value("${kakao.api.key}")
@@ -60,8 +62,6 @@ public class KakaoUtil {
                     // courseId 추가
                     for (Map<String, String> place : placeList) {
                         place.put("courseId", courseId);
-
-
                     }
 
                     return placeList;

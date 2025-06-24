@@ -72,6 +72,10 @@ public class MainService {
             wrapList.add(placeList);
         }
 
+        if (wrapList.stream().allMatch(List::isEmpty)) {
+            return ApiResponse.ok(null);
+        }
+
         // 1차 프롬프트: 필터링
         String filterPrompt = promptBuilder.recommendRouteFilterPrompt(
                 recommendRouteRequest.getPlaceNameList().isEmpty() ? "" : CommonUtil.ObjectToJson(recommendRouteRequest.getPlaceNameList())

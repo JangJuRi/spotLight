@@ -9,6 +9,10 @@ interface RouteLineManagerProps {
 }
 
 export default function RouteLineManager({ routeList }: RouteLineManagerProps) {
+    if (!routeList || routeList.length === 0) {
+        return null;
+    }
+
     useMarkers(routeList, true);
 
     useEffect(() => {
@@ -18,6 +22,7 @@ export default function RouteLineManager({ routeList }: RouteLineManagerProps) {
         let linePath: any[] = [];
 
         routeList.forEach((route, index) => {
+            console.log(route)
             linePath.push(new window.kakao.maps.LatLng(route.y, route.x));
         });
 

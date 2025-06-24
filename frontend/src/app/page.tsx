@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useRef, useState} from "react"
+import React, {useState} from "react"
 import axiosInstance from "@/config/axiosInstance";
 import Loading from "@/components/common/Loading";
 import MapContainer from "@/components/main/MapContainer";
@@ -53,9 +53,6 @@ export default function Home() {
         const { data, message, success } = result.data;
         if (success) {
             setPlaceListInfo(data);
-            console.log(data)
-            console.log(placeListInfo)
-            console.log(placeListInfo)
             setPlaceList(data.flatMap((item: PlaceListInfoProps) => item.placeList));
             setSearchPanelOpen(true);
         } else {
@@ -137,7 +134,20 @@ export default function Home() {
             </div>
 
             {/* 지도 및 설명 영역 */}
-            {mode === 'route' ? (
+            {mode === 'place' ? (
+                <div
+                    className="map-wrapper mx-auto mt-3"
+                    style={{
+                        width: '100%',
+                        transition: 'width 0.4s ease',
+                    }}
+                >
+                    <MapContainer placeList={placeList}
+                                  routeList={routeListInfo?.routeList}
+                                  mode={mode}
+                                  selectedPlace={selectedPlace}/>
+                </div>
+            ) : (
                 <div
                     className="d-flex justify-content-center gap-4 mt-4"
                     style={{ maxWidth: '90%', margin: '0 auto' }}
@@ -150,7 +160,7 @@ export default function Home() {
                             transition: 'width 0.4s ease',
                         }}
                     >
-                        <MapContainer routeList={routeListInfo.routeList} placeList={placeList} mode={mode}/>
+                        <MapContainer routeList={routeListInfo?.routeList} placeList={placeList} mode={mode}/>
                     </div>
                     <div
                         className="route-description p-3 border rounded"
@@ -161,7 +171,6 @@ export default function Home() {
                             overflowY: "scroll",
                         }}
                     >
-
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
                             <button
                                 className="btn btn-primary fw-bold"
@@ -173,41 +182,30 @@ export default function Home() {
                             <button
                                 className="btn btn-outline-primary fw-bold ms-2"
                                 style={{borderRadius: 6}}
+                                disabled={searchLocation === '' || !routeListInfo}
                                 onClick={() => reloadRecommend()}
                             >
                                 <i className="bi bi-arrow-clockwise"></i>
                             </button>
                         </div>
 
-                        <h5>📍 경로 설명</h5>
                         <span style={{ whiteSpace: 'pre-line' }}>
-                            {routeListInfo.description}
+                            {routeListInfo?.description ?? '검색 결과가 없습니다.'}
                         </span>
                     </div>
                 </div>
-            ) : (
-                <div
-                    className="map-wrapper mx-auto mt-3"
-                    style={{
-                        width: '100%',
-                        transition: 'width 0.4s ease',
-                    }}
-                >
-                    <MapContainer placeList={placeList}
-                                  routeList={routeListInfo.routeList}
-                                  mode={mode}
-                                  selectedPlace={selectedPlace}/>
-                </div>
             )}
 
+            {/* 루트 추천 모달 */}
             {modalOpen && <RouteSearchModal
                 onClose={(location:string, courseIdList: string[]) => {
-                    setModalOpen(false);
-                    setSearchLocation(location);
-                    setSearchCourseIdList(courseIdList);
+                    setModalOpen(false); // 모달 닫기
+                    setSearchLocation(location); // 검색어 저장 (장소)
+                    setSearchCourseIdList(courseIdList); // 검색어 저장 (코스)
                 }}
                 routeListInfoSetting={routeListInfoSetting}/>}
 
+            {/* 장소 리스트 슬라이드 패널 */}
             {mode === 'place' &&
                 <SlidePanel
                     isOpen={searchPanelOpen}

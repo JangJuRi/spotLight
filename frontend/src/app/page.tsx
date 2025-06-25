@@ -167,7 +167,7 @@ export default function Home() {
                         style={{
                             width: '40%',
                             height: '80vh',
-                            backgroundColor: '#f8f9fa',
+                            backgroundColor: '#ffffff',
                             overflowY: "scroll",
                         }}
                     >

@@ -3,6 +3,10 @@ import { PlaceProps } from "@/types/types";
 
 export const useMarkers = (placeList: PlaceProps[], showMarkerImage: boolean = false) => {
     useEffect(() => {
+        if (!placeList || placeList.length === 0) {
+            return;
+        }
+
         const map = window.mapInstance;
         if (!map || !window.kakao?.maps) return;
 

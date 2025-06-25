@@ -9,21 +9,22 @@ interface RouteLineManagerProps {
 }
 
 export default function RouteLineManager({ routeList }: RouteLineManagerProps) {
-    if (!routeList || routeList.length === 0) {
-        return null;
-    }
-
     useMarkers(routeList, true);
 
     useEffect(() => {
+        if (!routeList || routeList.length === 0) {
+            return;
+        }
+
         const map = window.mapInstance;
         if (!map || !window.kakao?.maps) return;
 
         let linePath: any[] = [];
 
         routeList.forEach((route, index) => {
-            console.log(route)
-            linePath.push(new window.kakao.maps.LatLng(route.y, route.x));
+            if (route.x && route.y) {
+                linePath.push(new window.kakao.maps.LatLng(route.y, route.x));
+            }
         });
 
         const polyline = new window.kakao.maps.Polyline({
